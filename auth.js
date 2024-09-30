@@ -1,8 +1,9 @@
 const JWT = require(`jsonwebtoken`);
 
 const auth = (req, res, next) => {
-  console.log("request to access");
+  console.log("request to access", req.headers);
   const { authorization } = req.headers;
+  console.log("auth", authorization);
   JWT.verify(authorization, process.env.JWT_SECRET, (err, result) => {
     if (err) {
       res.status(404).json({ message: "UN-Authorized Access" });
