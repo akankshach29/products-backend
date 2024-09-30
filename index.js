@@ -30,7 +30,11 @@ app.use(express.json());
   try {
     await db_establish_connection();
 
-    app.route(`/`).get(auth, (req, res) => {
+    app.route(`/`).get((req, res) => {
+      res.status(200).json({ message: "deployment is working" });
+    });
+
+    app.route(`/auth`).get(auth, (req, res) => {
       res.status(200).json({ message: "web-server is working" });
     });
 
