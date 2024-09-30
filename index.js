@@ -1,6 +1,7 @@
-const mongoose = require(`mongoose`);
-const JWT = require(`jsonwebtoken`);
 const bcrypt = require(`bcrypt`);
+const JWT = require(`jsonwebtoken`);
+const dotenv = require("dotenv");
+dotenv.config();
 var uniqid = require("uniqid");
 const { db_establish_connection } = require(`./DB/db_establish_connection`);
 // db_establish_connection()
@@ -9,7 +10,7 @@ const { productModel } = require(`./models/product.model.js`);
 const { cartModel } = require(`./models/cart.model.js`);
 const { wishlistModel } = require(`./models/wishlist.model.js`);
 const { ordersModel } = require("./models/order.model.js");
-const { auth } = require(`./auth.js`);
+// const { auth } = require(`./auth.js`);
 const express = require(`express`);
 const app = express();
 const cors = require(`cors`);
@@ -27,6 +28,34 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 app.use(express.json());
+
+const auth = (req, res, next) => {
+  const { authorization } = req.headers;
+  console.log("auth", req.headers);
+  if (!authorization) {
+    return res.status(403).json({ message: "Token is required" });
+  }
+  try {
+    const decoded = JWT.verify(authorization, process.env.JWT_SECRET);
+    req.headers.id = decoded.id;
+    req.headers.name = decoded.name;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "UN-Authorized Access" });
+  }
+
+  // JWT.verify(authorization, process.env.JWT_SECRET, (err, result) => {
+  //   console.log(result);
+  //   if (err) {
+  //     res.status(404).json({ message: "UN-Authorized Access" });
+  //   } else {
+  //     req.headers.id = result.id;
+  //     req.headers.name = result.name;
+  //     console.log(req.headers);
+  //     next();
+  //   }
+  // });
+};
 
 (async function () {
   try {
